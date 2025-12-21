@@ -23,7 +23,7 @@ steps:
       - '--allow-unauthenticated'
       - '--project'
       - 'magic-mirror-427812'
-      - '--set-env-vars'
-      - 'GITHUB_TOKEN=${_GITHUB_TOKEN},GITHUB_APP_ID=${_GITHUB_APP_ID},GITHUB_APP_CLIENT_ID=${_GITHUB_APP_CLIENT_ID},GITHUB_APP_CLIENT_SECRET=${_GITHUB_APP_CLIENT_SECRET},GITHUB_PRIVATE_KEY=${_GITHUB_PRIVATE_KEY}'
+      - '--set-secrets'
+      - 'GITHUB_TOKEN=GITHUB_TOKEN:latest,GITHUB_APP_CLIENT_ID=FORKMONKEY_GITHUB_CLIENT_ID:latest,GITHUB_APP_CLIENT_SECRET=FORKMONKEY_GITHUB_CLIENT_SECRET:latest'
 images:
   - 'us-central1-docker.pkg.dev/magic-mirror-427812/forkmonkey-repo/backend:latest'

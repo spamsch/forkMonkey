@@ -38,11 +38,26 @@ const ForkMonkey = {
         apiBaseUrl: 'https://forkmonkey-backend-1068119864554.us-central1.run.app/api' // Production Backend (Cloud Run)
     },
 
+    // Loading messages for fun UX
+    loadingMessages: [
+        "🐵 Waking up your monkey...",
+        "🧬 Decoding DNA sequence...",
+        "🍌 Feeding the monkey...",
+        "✨ Checking for mutations...",
+        "🌙 Consulting the AI oracle...",
+        "🔮 Reading monkey fortune...",
+        "🎨 Rendering pixels...",
+        "🧪 Analyzing genetics..."
+    ],
+
     /**
      * Initialize the application
      */
     async init() {
         console.log('%c🐵 ForkMonkey v2.0 Initializing...', 'color: #00ff88; font-size: 16px; font-weight: bold;');
+
+        // Start fun loading messages
+        this.startLoadingMessages();
 
         // Initialize particles background
         this.initParticles();
@@ -62,8 +77,62 @@ const ForkMonkey = {
         // Keyboard shortcuts
         this.initKeyboardShortcuts();
 
+        // Initialize floating CTA visibility
+        this.initFloatingCTA();
+
+        // Track page view
+        this.trackEvent('page_view', { page: 'dashboard' });
+
         console.log('%c✅ ForkMonkey Ready!', 'color: #00ff88; font-size: 14px;');
         this.showToast('🐵 ForkMonkey loaded!', 'success');
+    },
+
+    /**
+     * Rotate fun loading messages
+     */
+    startLoadingMessages() {
+        const messageEl = document.querySelector('.loading-message');
+        if (!messageEl) return;
+
+        let index = 0;
+        this.loadingInterval = setInterval(() => {
+            index = (index + 1) % this.loadingMessages.length;
+            messageEl.textContent = this.loadingMessages[index];
+        }, 1500);
+    },
+
+    /**
+     * Stop loading messages
+     */
+    stopLoadingMessages() {
+        if (this.loadingInterval) {
+            clearInterval(this.loadingInterval);
+        }
+    },
+
+    /**
+     * Initialize floating CTA visibility on scroll
+     */
+    initFloatingCTA() {
+        const floatingCta = document.getElementById('floating-cta');
+        if (!floatingCta) return;
+
+        // Show after scrolling down
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.scrollY;
+            if (currentScroll > 300) {
+                floatingCta.classList.add('visible');
+            } else {
+                floatingCta.classList.remove('visible');
+            }
+            lastScroll = currentScroll;
+        });
+
+        // Track click
+        floatingCta.addEventListener('click', () => {
+            this.trackEvent('cta_click', { location: 'floating_mobile' });
+        });
     },
 
     /**
@@ -114,9 +183,59 @@ const ForkMonkey = {
     updateNavStats() {
         const stats = this.data.stats;
         if (stats) {
-            document.getElementById('nav-generation').textContent = `Gen ${stats.generation || 1}`;
             document.getElementById('nav-rarity').textContent = `${(stats.rarity_score || 0).toFixed(1)}%`;
         }
+        // Fetch GitHub stats for social proof
+        this.fetchGitHubStats();
+    },
+
+    /**
+     * Fetch GitHub repository stats for social proof
+     */
+    async fetchGitHubStats() {
+        try {
+            const response = await fetch(`https://api.github.com/repos/${this.config.repoOwner}/${this.config.repoName}`);
+            if (response.ok) {
+                const data = await response.json();
+                // Update nav stats
+                const starsEl = document.getElementById('nav-stars');
+                const forksEl = document.getElementById('nav-forks');
+                if (starsEl) starsEl.textContent = this.formatNumber(data.stargazers_count);
+                if (forksEl) forksEl.textContent = this.formatNumber(data.forks_count);
+                
+                // Update social proof bar
+                const proofStars = document.getElementById('proof-stars');
+                const proofForks = document.getElementById('proof-forks');
+                if (proofStars) proofStars.textContent = `⭐ ${this.formatNumber(data.stargazers_count)} stars`;
+                if (proofForks) proofForks.textContent = `🍴 ${this.formatNumber(data.forks_count)} monkeys`;
+                
+                // Store for later use
+                this.githubStats = data;
+            }
+        } catch (error) {
+            console.log('Could not fetch GitHub stats:', error);
+        }
+    },
+
+    /**
+     * Format number with K/M suffix
+     */
+    formatNumber(num) {
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+        if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+        return num.toString();
+    },
+
+    /**
+     * Track analytics event
+     */
+    trackEvent(event, params = {}) {
+        // Google Analytics
+        if (typeof gtag !== 'undefined') {
+            gtag('event', event, params);
+        }
+        // Console for debugging
+        console.log(`[ForkMonkey Track] ${event}`, params);
     },
 
     /**
@@ -145,6 +264,9 @@ const ForkMonkey = {
         document.getElementById(tabId)?.classList.add('active');
 
         this.currentTab = tabId;
+
+        // Track tab view
+        this.trackEvent('tab_view', { tab: tabId });
 
         // Render content for the tab
         switch (tabId) {
@@ -214,6 +336,9 @@ const ForkMonkey = {
         const frame = document.getElementById('monkey-frame');
         const basePath = this.getBasePath();
 
+        // Stop loading messages
+        this.stopLoadingMessages();
+
         try {
             const response = await fetch(`${basePath}monkey_data/monkey.svg`);
             if (response.ok) {
@@ -227,7 +352,10 @@ const ForkMonkey = {
                 <div class="empty-state">
                     <div class="empty-state-icon">🐵</div>
                     <div class="empty-state-title">No Monkey Yet</div>
-                    <div class="empty-state-text">Run the initialization workflow to create your monkey!</div>
+                    <div class="empty-state-text">Fork the repo to create your own monkey!</div>
+                    <a href="https://github.com/roeiba/forkMonkey/fork" target="_blank" class="cta-button primary" style="margin-top: 16px; display: inline-flex;">
+                        🧬 Fork Your Monkey Now
+                    </a>
                 </div>
             `;
         }
@@ -771,6 +899,7 @@ const ForkMonkey = {
      */
     async shareMonkey() {
         const url = window.location.href;
+        this.trackEvent('share_clicked', { method: 'native' });
 
         if (navigator.share) {
             try {
@@ -790,6 +919,85 @@ const ForkMonkey = {
                 this.showToast('Failed to copy link', 'error');
             }
         }
+    },
+
+    /**
+     * Share on Twitter with pre-written viral tweet
+     */
+    shareTwitter() {
+        const stats = this.data.stats || {};
+        const rarity = (stats.rarity_score || 0).toFixed(1);
+        const generation = stats.generation || 1;
+        const ageDays = stats.age_days || 0;
+        
+        const tweetText = `Check out my ForkMonkey! 🐵
+
+Rarity: ${rarity}/100
+Generation: ${generation}
+Age: ${ageDays} days
+
+It evolves daily with AI and lives forever on GitHub.
+
+Fork yours free: https://github.com/roeiba/forkMonkey
+
+#ForkMonkey #AI #GitHub #OpenSource`;
+
+        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+        window.open(tweetUrl, '_blank', 'width=550,height=420');
+        
+        this.trackEvent('share_clicked', { platform: 'twitter' });
+        this.showToast('🐦 Opening Twitter...', 'success');
+    },
+
+    /**
+     * Copy shareable link to clipboard
+     */
+    async copyShareLink() {
+        const url = window.location.href;
+        try {
+            await navigator.clipboard.writeText(url);
+            this.showToast('📋 Link copied! Share it everywhere!', 'success');
+            this.trackEvent('share_clicked', { method: 'copy_link' });
+        } catch (err) {
+            this.showToast('Failed to copy link', 'error');
+        }
+    },
+
+    /**
+     * Share evolution achievement on Twitter
+     */
+    shareEvolutionTwitter(evolutionData) {
+        const text = `Day ${evolutionData.day || '?'} of my #ForkMonkey experiment! 🐵
+
+Today's evolution: ${evolutionData.change || 'Mystery mutation'}
+Rarity: ${evolutionData.rarity || '?'}/100
+
+Fork yours free: https://github.com/roeiba/forkMonkey
+
+#AI #GitHub #OpenSource`;
+
+        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+        window.open(tweetUrl, '_blank', 'width=550,height=420');
+        this.trackEvent('share_evolution', { platform: 'twitter' });
+    },
+
+    /**
+     * Share leaderboard rank
+     */
+    shareRankTwitter(rank) {
+        const stats = this.data.stats || {};
+        const text = `📊 My ForkMonkey is ranked #${rank} on the rarity leaderboard!
+
+Rarity: ${(stats.rarity_score || 0).toFixed(1)}/100
+
+Think you can beat me?
+https://github.com/roeiba/forkMonkey
+
+#ForkMonkey`;
+
+        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+        window.open(tweetUrl, '_blank', 'width=550,height=420');
+        this.trackEvent('share_rank', { platform: 'twitter', rank });
     },
 
     /**

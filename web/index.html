@@ -12,31 +12,31 @@
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="ForkMonkey: Your digital pet that lives forever on GitHub and evolves daily with AI. Fork to breed, collect rare traits, and join the community.">
+        content="Fork a monkey. Watch it evolve with AI every night. Breed rare traits through forking. 100% free, forever on GitHub.">
     <meta name="keywords"
-        content="ForkMonkey, GitHub, digital pet, AI evolution, NFT alternative, collectibles, fork breeding">
-    <meta name="author" content="ForkZoo">
+        content="ForkMonkey, GitHub, digital pet, AI evolution, NFT alternative, collectibles, fork breeding, tamagotchi, open source">
+    <meta name="author" content="ForkMonkey">
     <meta name="robots" content="index, follow">
 
     <!-- Open Graph -->
-    <meta property="og:title" content="ForkMonkey - AI-Evolving Digital Collectibles on GitHub">
+    <meta property="og:title" content="🐵 ForkMonkey - Your AI Pet That Lives on GitHub">
     <meta property="og:description"
-        content="Your digital pet that lives forever on GitHub and evolves daily with AI. Fork to breed, collect rare traits, and watch your monkey evolve!">
+        content="Fork a digital pet. AI evolves it daily. Breed rare traits. Free forever. Join 1000+ monkey families!">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://roeiba.github.io/forkMonkey/">
     <meta property="og:image" content="https://raw.githubusercontent.com/roeiba/forkMonkey/main/web/og-preview.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="ForkMonkey - A cute AI-evolving digital monkey collectible">
+    <meta property="og:image:alt" content="ForkMonkey - AI-evolving digital pets on GitHub">
     <meta property="og:site_name" content="ForkMonkey">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="ForkMonkey - AI-Evolving Digital Collectibles">
+    <meta name="twitter:title" content="🐵 ForkMonkey - AI Pets on GitHub">
     <meta name="twitter:description"
-        content="Your digital pet that lives forever on GitHub and evolves daily with AI. Fork to breed!">
+        content="Fork a monkey. AI evolves it daily. Breed rare traits. 100% free, forever.">
     <meta name="twitter:image" content="https://raw.githubusercontent.com/roeiba/forkMonkey/main/web/og-preview.jpg">
-    <meta name="twitter:image:alt" content="ForkMonkey - A cute AI-evolving digital monkey collectible">
+    <meta name="twitter:image:alt" content="ForkMonkey - AI-evolving digital pets on GitHub">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -62,7 +62,7 @@
                 <div class="brand-icon">🐵</div>
                 <div class="brand-text">
                     <h1>FORKMONKEY</h1>
-                    <span class="brand-tagline">AI EVOLUTION ENGINE</span>
+                    <span class="brand-tagline">YOUR PET THAT LIVES ON GITHUB</span>
                 </div>
 
             <div class="nav-tabs" id="nav-tabs">
@@ -90,12 +90,16 @@
         </div>
 
             <div class="nav-stats">
-                <div class="quick-stat">
-                    <span class="stat-icon">🧬</span>
-                    <span class="stat-value" id="nav-generation">-</span>
-                </div>
-                <div class="quick-stat">
+                <div class="quick-stat" title="GitHub Stars">
                     <span class="stat-icon">⭐</span>
+                    <span class="stat-value" id="nav-stars">-</span>
+                </div>
+                <div class="quick-stat" title="Monkeys Born (Forks)">
+                    <span class="stat-icon">🍴</span>
+                    <span class="stat-value" id="nav-forks">-</span>
+                </div>
+                <div class="quick-stat" title="Your Rarity Score">
+                    <span class="stat-icon">💎</span>
                     <span class="stat-value" id="nav-rarity">-</span>
                 </div>
             </div>
@@ -113,10 +117,10 @@
                         <div class="monkey-showcase">
                             <div class="monkey-glow"></div>
                             <div class="monkey-frame" id="monkey-frame">
-                                <div class="loading-state">
-                                    <div class="loader"></div>
-                                    <p>Initializing DNA sequence...</p>
-                                </div>
+                <div class="loading-state">
+                    <div class="loader"></div>
+                    <p class="loading-message">🐵 Waking up your monkey...</p>
+                </div>
                             </div>
                         </div>
 
@@ -138,6 +142,26 @@
                                     <span>🔗</span> Share
                                 </button>
                             </div>
+
+                            <!-- Viral Share Buttons -->
+                            <div class="share-buttons">
+                                <button class="share-btn twitter" onclick="ForkMonkey.shareTwitter()">
+                                    <span>🐦</span> Tweet My Monkey
+                                </button>
+                                <button class="share-btn copy" onclick="ForkMonkey.copyShareLink()">
+                                    <span>📋</span> Copy Link
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Hero CTA -->
+                        <div class="hero-cta">
+                            <a href="https://github.com/roeiba/forkMonkey/fork" target="_blank" class="cta-button primary pulse">
+                                🧬 Fork Your Own Monkey – It's Free
+                            </a>
+                            <p class="cta-subtext">
+                                Takes 30 seconds • Evolves daily with AI • Yours forever
+                            </p>
                         </div>
                     </div>
 
@@ -213,6 +237,16 @@
                             </div>
                         </div>
                         <p class="last-updated" id="network-updated">Last scan: -</p>
+                        
+                        <!-- Social Proof Bar -->
+                        <div class="social-proof-bar">
+                            <div class="proof-item">
+                                <span class="proof-number" id="proof-stars">⭐ ---</span>
+                            </div>
+                            <div class="proof-item">
+                                <span class="proof-number" id="proof-forks">🍴 ---</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -600,6 +634,11 @@
 
     <!-- Toast notifications -->
     <div class="toast-container" id="toast-container"></div>
+
+    <!-- Floating Mobile CTA -->
+    <a href="https://github.com/roeiba/forkMonkey/fork" target="_blank" class="floating-cta" id="floating-cta">
+        🐵 Get Your Monkey
+    </a>
 
     <!-- Particles.js -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>

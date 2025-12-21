@@ -1,6 +1,17 @@
 # 🐵 ForkMonkey
 
-> **Your digital pet that lives forever on GitHub and evolves with AI**
+> **Fork a monkey. Watch it evolve with AI. Breed rare traits. Free forever.**
+
+<div align="center">
+
+[![Fork ForkMonkey](https://img.shields.io/github/forks/roeiba/forkMonkey?style=for-the-badge&label=🍴%20Fork%20Your%20Monkey&color=00ff88)](https://github.com/roeiba/forkMonkey/fork)
+[![Stars](https://img.shields.io/github/stars/roeiba/forkMonkey?style=for-the-badge&color=ffd700)](https://github.com/roeiba/forkMonkey)
+
+**🧬 Takes 30 seconds to start • ⚡ Evolves daily with AI • 💸 100% Free Forever**
+
+</div>
+
+---
 
 ForkMonkey is an autonomous, self-evolving digital collectible that combines:
 - 🎮 **Tamagotchi-style** digital pets
@@ -218,6 +229,22 @@ curl https://api.github.com/repos/{owner}/forkMonkey/contents/monkey_data/stats.
 python src/cli.py family-tree
 ```
 
+---
+
+## 🍴 This Monkey Wants Siblings!
+
+<div align="center">
+
+**Fork this repo to create a child monkey that inherits traits + gets random mutations!**
+
+[![Fork This Monkey](https://img.shields.io/badge/🍴_Fork_&_Breed_Now-00ff88?style=for-the-badge&labelColor=1a1a2e)](https://github.com/roeiba/forkMonkey/fork)
+
+*"My monkey evolved a LEGENDARY golden trait on day 23!"* — Happy Adopter
+
+</div>
+
+---
+
 ## Contributing
 
 Want to improve ForkMonkey?
@@ -239,4 +266,10 @@ MIT License - Fork, breed, and evolve freely!
 
 ---
 
+<div align="center">
+
 **Your monkey is unique. Your monkey is alive. Your monkey is forever on GitHub.** 🐵✨
+
+[![Fork Now](https://img.shields.io/badge/🧬_Start_Your_Lineage-ff0055?style=for-the-badge)](https://github.com/roeiba/forkMonkey/fork)
+
+</div>

@@ -1,0 +1,38 @@
+name: Community Scan
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Run daily at midnight
+  workflow_dispatch:      # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  scan-and-update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install PyGithub
+
+      - name: Run Community Scanner
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python src/scan_community.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name 'ForkMonkey Bot'
+          git config --global user.email 'bot@forkmonkey.ai'
+          git add web/community_data.json
+          git commit -m "Update community data [skip ci]" || echo "No changes to commit"
+          git push

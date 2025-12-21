@@ -1,30 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ForkMonkey - Cyberpunk Edition</title>
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
     <!-- Custom styles -->
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <!-- Particle background -->
     <div id="particles-js"></div>
-    
+
     <!-- Main container -->
     <div class="container">
         <!-- Header -->
         <header class="header glass-panel">
             <div class="logo-container">
                 <div class="pixel-icon">🐵</div>
-                <h1 class="title">FORKMONKEY</h1>
+                <div class="title-wrapper">
+                    <h1 class="title">FORKMONKEY</h1>
+                    <div class="subtitle">COMMUNITY EDITION</div>
+                </div>
             </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="main-nav">
+                <button class="nav-tab active" data-tab="dashboard">DASHBOARD</button>
+                <button class="nav-tab" data-tab="history">HISTORY</button>
+                <button class="nav-tab" data-tab="community">COMMUNITY</button>
+            </nav>
+
             <div class="header-stats">
                 <div class="stat-badge">
                     <span class="stat-label">GEN</span>
@@ -41,57 +56,125 @@
             </div>
         </header>
 
-        <!-- Main content grid -->
-        <div class="content-grid">
-            <!-- Left panel - Monkey display -->
-            <div class="panel monkey-panel glass-panel">
-                <div class="panel-header">
-                    <h2>YOUR MONKEY</h2>
-                    <div class="dna-hash" id="dna-hash">Loading...</div>
-                </div>
-                <div class="monkey-display">
-                    <div class="monkey-container" id="monkey-svg">
-                        <!-- SVG will be loaded here -->
-                        <div class="loading-spinner">
-                            <p>INITIALIZING SEQUENCE...</p>
+        <!-- Tab Content: Dashboard -->
+        <div id="dashboard" class="tab-content active">
+            <div class="content-grid">
+                <!-- Left panel - Monkey display -->
+                <div class="panel monkey-panel glass-panel">
+                    <div class="panel-header">
+                        <h2>YOUR MONKEY</h2>
+                        <div class="dna-hash" id="dna-hash">Loading...</div>
+                    </div>
+                    <div class="monkey-display">
+                        <div class="monkey-container" id="monkey-svg">
+                            <!-- SVG will be loaded here -->
+                            <div class="loading-spinner">
+                                <p>INITIALIZING SEQUENCE...</p>
+                            </div>
+                        </div>
+                        <div class="monkey-info">
+                            <div class="info-row">
+                                <span class="info-label">Mutations</span>
+                                <span class="info-value" id="mutations">0</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Parent</span>
+                                <span class="info-value" id="parent">Genesis</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="monkey-info">
-                        <div class="info-row">
-                            <span class="info-label">Mutations</span>
-                            <span class="info-value" id="mutations">0</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Parent</span>
-                            <span class="info-value" id="parent">Genesis</span>
-                        </div>
+                </div>
+
+                <!-- Right panel - Traits -->
+                <div class="panel traits-panel glass-panel">
+                    <div class="panel-header">
+                        <h2>TRAITS</h2>
+                        <button class="nes-btn refresh-btn" onclick="loadMonkeyData()">
+                            <span>↻</span>
+                        </button>
+                    </div>
+                    <div class="traits-grid" id="traits-grid">
+                        <!-- Traits will be loaded here -->
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Right panel - Traits -->
-            <div class="panel traits-panel glass-panel">
+        <!-- Tab Content: History -->
+        <div id="history" class="tab-content">
+            <div class="panel glass-panel full-width">
                 <div class="panel-header">
-                    <h2>TRAITS</h2>
-                    <button class="nes-btn refresh-btn" onclick="loadMonkeyData()">
-                        <span>↻</span>
+                    <h2>EVOLUTION TIMELINE</h2>
+                    <div class="status-indicator">
+                        <span class="status-dot active"></span>
+                        <span id="evolution-count">0</span> generations
+                    </div>
+                </div>
+                <div class="evolution-timeline" id="evolution-timeline">
+                    <!-- Evolution SVGs will be loaded here -->
+                    <div class="loading-spinner">
+                        <p>LOADING EVOLUTION HISTORY...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Community -->
+        <div id="community" class="tab-content">
+            <!-- GitHub Token Settings -->
+            <button class="settings-toggle" onclick="toggleSettings()">
+                <span>⚙️</span>
+                <span>GitHub API Settings</span>
+            </button>
+
+            <div class="settings-panel" id="settings-panel">
+                <p style="color: var(--text-muted); font-size: var(--font-sm); margin-bottom: var(--spacing-sm);">
+                    Enter your GitHub Personal Access Token for higher API rate limits (5000/hour vs 60/hour)
+                </p>
+                <div class="token-input-group">
+                    <input type="password" class="token-input" id="github-token"
+                        placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+                    <button class="nes-btn" onclick="saveGitHubToken()">
+                        <span>SAVE</span>
+                    </button>
+                    <button class="nes-btn" onclick="clearGitHubToken()">
+                        <span>CLEAR</span>
                     </button>
                 </div>
-                <div class="traits-grid" id="traits-grid">
-                    <!-- Traits will be loaded here -->
-                </div>
+                <p style="color: var(--text-dim); font-size: var(--font-xs); margin-top: var(--spacing-sm);">
+                    Token is stored locally in your browser. <a href="https://github.com/settings/tokens"
+                        target="_blank" style="color: var(--primary);">Create token</a>
+                </p>
             </div>
 
-            <!-- Bottom panel - Evolution history -->
-            <div class="panel history-panel glass-panel">
+            <div class="panel glass-panel full-width">
                 <div class="panel-header">
-                    <h2>EVOLUTION LOG</h2>
-                    <div class="history-count">
-                        <span id="history-count">0</span> events
+                    <h2>FORKZOO COMMUNITY</h2>
+                    <div style="display: flex; gap: var(--spacing-sm); align-items: center;">
+                        <div class="status-indicator" id="community-status">
+                            <span class="status-dot"></span>
+                            <span id="community-status-text">Idle</span>
+                        </div>
+                        <button class="nes-btn" onclick="loadCommunityData()">
+                            <span>SCAN NETWORK</span>
+                        </button>
                     </div>
                 </div>
-                <div class="history-timeline" id="history-timeline">
-                    <!-- History will be loaded here -->
+
+                <div class="community-grid" id="community-grid">
+                    <div class="loading-spinner">
+                        <p>READY TO SCAN...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for full-size SVG viewing -->
+        <div class="modal-overlay" id="svg-modal">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeModal()">×</button>
+                <div class="modal-svg-container" id="modal-svg-container">
+                    <!-- SVG will be loaded here -->
                 </div>
             </div>
         </div>
@@ -114,8 +197,9 @@
 
     <!-- Particles.js -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    
+
     <!-- Custom script -->
     <script src="script.js"></script>
 </body>
+
 </html>

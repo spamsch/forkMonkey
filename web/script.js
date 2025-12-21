@@ -154,29 +154,21 @@ const ForkMonkey = {
     },
 
     /**
-     * Get path for web-local files (in web/ folder)
-     * In production: files are at root
-     * In dev mode: files are in /web/
-     */
-    getWebPath() {
-        return this.getDevMode() ? '' : '';
-    },
-
-    /**
      * Load all static JSON data files
      */
     async loadAllData() {
         const basePath = this.getBasePath();
-        const webPath = this.getWebPath();
 
         const files = [
+            // Files in monkey_data/ (outside web/ in dev, inside web/ in prod)
             ['dna', `${basePath}monkey_data/dna.json`],
             ['stats', `${basePath}monkey_data/stats.json`],
             ['history', `${basePath}monkey_data/history.json`],
-            ['community', `${webPath}community_data.json`],
-            ['leaderboard', `${webPath}leaderboard.json`],
-            ['familyTree', `${webPath}family_tree.json`],
-            ['networkStats', `${webPath}network_stats.json`]
+            // Files in web/ (same folder as index.html)
+            ['community', 'community_data.json'],
+            ['leaderboard', 'leaderboard.json'],
+            ['familyTree', 'family_tree.json'],
+            ['networkStats', 'network_stats.json']
         ];
 
         const results = await Promise.allSettled(

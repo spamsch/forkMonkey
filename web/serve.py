@@ -232,7 +232,7 @@ Press Ctrl+C to stop the server
         # Check if running in a container or headless env to avoid errors, 
         # but for this user (Mac) it's fine.
         try:
-            webbrowser.open(f'http://localhost:{PORT}/web/index.html')
+            webbrowser.open(f'http://localhost:{PORT}/web/index.html?dev=true')
         except:
             pass
         

@@ -136,21 +136,30 @@ const ForkMonkey = {
     },
 
     /**
+     * Check if running in development mode (local server)
+     * Uses ?dev=true query param instead of hostname detection for custom domains
+     */
+    getDevMode() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('dev') === 'true';
+    },
+
+    /**
      * Get base path for data files (relative to web/ folder)
+     * In production: files are at root (deployed via GitHub Pages)
+     * In dev mode: files are one level up from web/
      */
     getBasePath() {
-        const isGitHubPages = window.location.hostname.includes('github.io');
-        // On GitHub Pages, web/ is root. Locally, we're at /web/
-        return isGitHubPages ? '' : '/';
+        return this.getDevMode() ? '/../' : '';
     },
 
     /**
      * Get path for web-local files (in web/ folder)
+     * In production: files are at root
+     * In dev mode: files are in /web/
      */
     getWebPath() {
-        const isGitHubPages = window.location.hostname.includes('github.io');
-        // On GitHub Pages, files are at root. Locally, they're in /web/
-        return isGitHubPages ? '' : '/web/';
+        return this.getDevMode() ? '' : '';
     },
 
     /**

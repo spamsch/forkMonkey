@@ -168,6 +168,10 @@ class MonkeyStorage:
     def save_stats(self, dna: MonkeyDNA, age_days: int = 0) -> bool:
         """Save monkey statistics"""
         try:
+            # Load existing stats to track streak
+            stats_file = self.data_dir / "stats.json"
+            streak = self._calculate_streak(stats_file)
+            
             stats = {
                 "dna_hash": dna.dna_hash,
                 "generation": dna.generation,
@@ -182,10 +186,10 @@ class MonkeyStorage:
                     }
                     for cat, trait in dna.traits.items()
                 },
+                "streak": streak,
                 "last_updated": datetime.now().isoformat()
             }
             
-            stats_file = self.data_dir / "stats.json"
             with open(stats_file, "w") as f:
                 json.dump(stats, f, indent=2)
             
@@ -195,6 +199,55 @@ class MonkeyStorage:
         except Exception as e:
             print(f"❌ Failed to save stats: {e}")
             return False
+    
+    def _calculate_streak(self, stats_file: Path) -> dict:
+        """Calculate evolution streak from history"""
+        try:
+            # Load existing stats
+            if stats_file.exists():
+                with open(stats_file, "r") as f:
+                    old_stats = json.load(f)
+                old_streak = old_stats.get("streak", {"current": 0, "best": 0, "last_date": None})
+            else:
+                old_streak = {"current": 0, "best": 0, "last_date": None}
+            
+            today = datetime.now().date().isoformat()
+            last_date = old_streak.get("last_date")
+            
+            if last_date:
+                last = datetime.fromisoformat(last_date).date()
+                today_date = datetime.now().date()
+                diff = (today_date - last).days
+                
+                if diff == 0:
+                    # Same day, no streak change
+                    return old_streak
+                elif diff == 1:
+                    # Consecutive day, increment streak
+                    new_current = old_streak["current"] + 1
+                    new_best = max(new_current, old_streak["best"])
+                    return {"current": new_current, "best": new_best, "last_date": today}
+                else:
+                    # Streak broken
+                    return {"current": 1, "best": old_streak["best"], "last_date": today}
+            else:
+                # First time
+                return {"current": 1, "best": 1, "last_date": today}
+                
+        except Exception:
+            return {"current": 1, "best": 1, "last_date": datetime.now().date().isoformat()}
+    
+    def get_streak(self) -> dict:
+        """Get current streak information"""
+        try:
+            stats_file = self.data_dir / "stats.json"
+            if stats_file.exists():
+                with open(stats_file, "r") as f:
+                    stats = json.load(f)
+                return stats.get("streak", {"current": 0, "best": 0, "last_date": None})
+        except Exception:
+            pass
+        return {"current": 0, "best": 0, "last_date": None}
     
     def detect_fork(self) -> Optional[str]:
         """

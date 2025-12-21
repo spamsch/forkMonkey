@@ -117,6 +117,28 @@ Fork any monkey to create a child that inherits traits:
 | 💙 Rare | 10% | Unique patterns |
 | 🦄 Legendary | 5% | Ultra-rare combos |
 
+### 💎 Extinct Traits (Gen-Locked)
+Some legendary traits are **only available in early generations** — they become EXTINCT forever:
+
+| Trait | Max Generation | Status |
+|-------|:--------------:|:------:|
+| 🏆 Genesis Aura | Gen 1 only | 🔒 |
+| 👑 Alpha Crown | Gen 1-3 | 🔒 |
+| ✨ Founders Badge | Gen 1-5 | 🔒 |
+| 🌟 Pioneer Glow | Gen 1-10 | 🔒 |
+
+**Fork early to get these ultra-rare traits before they're gone forever!**
+
+### 🔥 Evolution Streaks
+Keep your monkey evolving daily to build streaks and unlock rewards:
+
+| Streak | Reward |
+|--------|--------|
+| 🏅 7 days | Week Warrior badge |
+| ⚔️ 14 days | Fortnight Fighter |
+| 💎 30 days | Diamond Hands |
+| 💯 100 days | Century Legend |
+
 ### 🌳 Family Tree
 Watch the network grow as monkeys breed across GitHub. Your lineage matters!
 
@@ -217,6 +239,16 @@ forkMonkey/
 ### **Fork this repo to create a child monkey!**
 
 Your child inherits traits from this monkey + gets random mutations.
+
+<!-- LINEAGE_STATS_START -->
+🧬 **Notable Traits:** **Horns** (rare)
+
+🍴 Fork to inherit these rare genetics!
+<!-- LINEAGE_STATS_END -->
+
+<!-- BREEDING_BOOST_START -->
+🔥 **Breeding boost active!** Fork now for enhanced trait inheritance.
+<!-- BREEDING_BOOST_END -->
 
 **Will you breed the next Legendary?** 🦄
 

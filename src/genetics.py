@@ -85,6 +85,26 @@ class MonkeyDNA(BaseModel):
 class GeneticsEngine:
     """Handles all genetic operations"""
     
+    # Gen-locked traits that become EXTINCT after certain generations
+    # These are ONLY available in early generations, making them ultra-rare
+    GEN_LOCKED_TRAITS = {
+        TraitCategory.BODY_COLOR: {
+            5: ["prismatic"],      # Only Gen 1-5 can have prismatic
+            3: ["genesis_gold"],   # Only Gen 1-3 can have genesis gold
+            1: ["origin_white"],   # Only Gen 1 (original forks) can have this
+        },
+        TraitCategory.ACCESSORY: {
+            5: ["founders_badge"],  # Early adopter badge
+            3: ["alpha_crown"],     # Alpha tester crown
+            1: ["genesis_aura"],    # Original genesis aura
+        },
+        TraitCategory.SPECIAL: {
+            10: ["pioneer_glow"],   # First 10 generations
+            5: ["early_spark"],     # First 5 generations
+            1: ["genesis_blessing"], # Only originals
+        }
+    }
+    
     # Trait definitions with rarity
     TRAIT_POOL = {
         TraitCategory.BODY_COLOR: {
@@ -126,20 +146,41 @@ class GeneticsEngine:
     }
     
     @classmethod
+    def get_gen_locked_traits(cls, category: TraitCategory, generation: int) -> List[str]:
+        """Get gen-locked traits available for this generation"""
+        available = []
+        if category in cls.GEN_LOCKED_TRAITS:
+            for max_gen, traits in cls.GEN_LOCKED_TRAITS[category].items():
+                if generation <= max_gen:
+                    available.extend(traits)
+        return available
+    
+    @classmethod
     def generate_random_dna(cls, generation: int = 1, parent_id: Optional[str] = None) -> MonkeyDNA:
         """Generate completely random DNA"""
         traits = {}
         
         for category in TraitCategory:
-            rarity = cls._roll_rarity()
-            available_traits = cls.TRAIT_POOL[category][rarity]
-            value = random.choice(available_traits)
-            
-            traits[category] = Trait(
-                category=category,
-                value=value,
-                rarity=rarity
-            )
+            # 5% chance to get a gen-locked trait if eligible
+            gen_locked = cls.get_gen_locked_traits(category, generation)
+            if gen_locked and random.random() < 0.05:
+                value = random.choice(gen_locked)
+                # Gen-locked traits are always LEGENDARY
+                traits[category] = Trait(
+                    category=category,
+                    value=value,
+                    rarity=Rarity.LEGENDARY
+                )
+            else:
+                rarity = cls._roll_rarity()
+                available_traits = cls.TRAIT_POOL[category][rarity]
+                value = random.choice(available_traits)
+                
+                traits[category] = Trait(
+                    category=category,
+                    value=value,
+                    rarity=rarity
+                )
         
         return MonkeyDNA(
             generation=generation,
@@ -171,12 +212,28 @@ class GeneticsEngine:
             parent_dna: Parent's DNA
             mutation_rate: Probability of mutation per trait (0-1)
         """
+        child_generation = parent_dna.generation + 1
         child_traits = {}
         
         for category in TraitCategory:
-            if random.random() < 0.5:
+            # Check for gen-locked traits first (3% chance for children)
+            gen_locked = cls.get_gen_locked_traits(category, child_generation)
+            if gen_locked and random.random() < 0.03:
+                value = random.choice(gen_locked)
+                child_traits[category] = Trait(
+                    category=category,
+                    value=value,
+                    rarity=Rarity.LEGENDARY  # Gen-locked = legendary
+                )
+            elif random.random() < 0.5:
                 # Inherit from parent
-                child_traits[category] = parent_dna.traits[category].model_copy()
+                parent_trait = parent_dna.traits[category]
+                # Check if parent's trait is gen-locked and still available
+                if parent_trait.value in gen_locked:
+                    # Can inherit gen-locked trait from parent!
+                    child_traits[category] = parent_trait.model_copy()
+                else:
+                    child_traits[category] = parent_trait.model_copy()
             else:
                 # Generate new trait
                 rarity = cls._roll_rarity()
@@ -194,7 +251,7 @@ class GeneticsEngine:
                 child_traits[category] = cls._mutate_trait(child_traits[category])
         
         return MonkeyDNA(
-            generation=parent_dna.generation + 1,
+            generation=child_generation,
             parent_id=parent_dna.dna_hash,
             traits=child_traits,
             birth_timestamp=int(random.random() * 1000000)

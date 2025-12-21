@@ -104,5 +104,55 @@ class TestMonkeyStorage:
         assert history == []
 
 
+class TestStreakSystem:
+    """Test evolution streak tracking"""
+    
+    def test_first_streak(self, temp_storage):
+        """Test first evolution starts streak at 1"""
+        dna = GeneticsEngine.generate_random_dna()
+        
+        # Save stats (which calculates streak)
+        temp_storage.save_stats(dna, age_days=1)
+        
+        streak = temp_storage.get_streak()
+        assert streak["current"] == 1
+        assert streak["best"] == 1
+        assert streak["last_date"] is not None
+    
+    def test_streak_same_day_no_increment(self, temp_storage):
+        """Test that multiple saves same day don't increment streak"""
+        dna = GeneticsEngine.generate_random_dna()
+        
+        # Save multiple times same day
+        temp_storage.save_stats(dna, age_days=1)
+        temp_storage.save_stats(dna, age_days=1)
+        temp_storage.save_stats(dna, age_days=1)
+        
+        streak = temp_storage.get_streak()
+        # Should still be 1 (same day)
+        assert streak["current"] == 1
+    
+    def test_get_streak_empty(self, temp_storage):
+        """Test getting streak when no stats exist"""
+        streak = temp_storage.get_streak()
+        assert streak["current"] == 0
+        assert streak["best"] == 0
+        assert streak["last_date"] is None
+    
+    def test_streak_persists(self, temp_storage):
+        """Test streak data persists in stats.json"""
+        dna = GeneticsEngine.generate_random_dna()
+        temp_storage.save_stats(dna, age_days=1)
+        
+        # Read raw file
+        stats_file = Path("monkey_data/stats.json")
+        with open(stats_file) as f:
+            stats = json.load(f)
+        
+        assert "streak" in stats
+        assert stats["streak"]["current"] >= 1
+        assert stats["streak"]["best"] >= 1
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

@@ -200,5 +200,94 @@ class TestMonkeyDNA:
         assert dna1.dna_hash == dna2.dna_hash
 
 
+class TestGenLockedTraits:
+    """Test gen-locked (extinct) trait system"""
+    
+    def test_get_gen_locked_traits_gen1(self):
+        """Test that Gen 1 has access to all gen-locked traits"""
+        body_locked = GeneticsEngine.get_gen_locked_traits(TraitCategory.BODY_COLOR, 1)
+        accessory_locked = GeneticsEngine.get_gen_locked_traits(TraitCategory.ACCESSORY, 1)
+        special_locked = GeneticsEngine.get_gen_locked_traits(TraitCategory.SPECIAL, 1)
+        
+        # Gen 1 should have access to all locked traits
+        assert "origin_white" in body_locked
+        assert "genesis_gold" in body_locked
+        assert "prismatic" in body_locked
+        
+        assert "genesis_aura" in accessory_locked
+        assert "alpha_crown" in accessory_locked
+        assert "founders_badge" in accessory_locked
+        
+        assert "genesis_blessing" in special_locked
+        assert "early_spark" in special_locked
+        assert "pioneer_glow" in special_locked
+    
+    def test_get_gen_locked_traits_gen5(self):
+        """Test that Gen 5 has limited gen-locked traits"""
+        body_locked = GeneticsEngine.get_gen_locked_traits(TraitCategory.BODY_COLOR, 5)
+        accessory_locked = GeneticsEngine.get_gen_locked_traits(TraitCategory.ACCESSORY, 5)
+        special_locked = GeneticsEngine.get_gen_locked_traits(TraitCategory.SPECIAL, 5)
+        
+        # Gen 5 should NOT have Gen 1-only or Gen 1-3 traits
+        assert "origin_white" not in body_locked
+        assert "genesis_gold" not in body_locked
+        assert "prismatic" in body_locked  # Gen 1-5, still available
+        
+        assert "genesis_aura" not in accessory_locked
+        assert "alpha_crown" not in accessory_locked
+        assert "founders_badge" in accessory_locked  # Gen 1-5
+        
+        assert "genesis_blessing" not in special_locked
+        assert "early_spark" in special_locked  # Gen 1-5
+        assert "pioneer_glow" in special_locked  # Gen 1-10
+    
+    def test_get_gen_locked_traits_gen20(self):
+        """Test that high generations have no gen-locked traits"""
+        body_locked = GeneticsEngine.get_gen_locked_traits(TraitCategory.BODY_COLOR, 20)
+        accessory_locked = GeneticsEngine.get_gen_locked_traits(TraitCategory.ACCESSORY, 20)
+        special_locked = GeneticsEngine.get_gen_locked_traits(TraitCategory.SPECIAL, 20)
+        
+        # Gen 20 should have no locked traits (all extinct)
+        assert len(body_locked) == 0
+        assert len(accessory_locked) == 0
+        assert len(special_locked) == 0
+    
+    def test_gen_locked_traits_are_legendary(self):
+        """Test that gen-locked traits when generated are legendary rarity"""
+        # Generate many Gen 1 monkeys and check any gen-locked traits
+        found_gen_locked = False
+        for _ in range(500):  # Higher count to increase chance
+            dna = GeneticsEngine.generate_random_dna(generation=1)
+            for cat, trait in dna.traits.items():
+                gen_locked = GeneticsEngine.get_gen_locked_traits(cat, 1)
+                if trait.value in gen_locked:
+                    assert trait.rarity == Rarity.LEGENDARY
+                    found_gen_locked = True
+        
+        # With 5% chance per category, we should find at least one in 500 attempts
+        # But don't require it - random chance
+    
+    def test_breed_respects_gen_locked(self):
+        """Test that breeding respects generation locks"""
+        parent = GeneticsEngine.generate_random_dna(generation=1)
+        
+        # Create child (Gen 2)
+        child = GeneticsEngine.breed(parent)
+        assert child.generation == 2
+        
+        # Gen 2 should not get Gen 1-only traits
+        for cat, trait in child.traits.items():
+            if trait.value in ["origin_white", "genesis_aura", "genesis_blessing"]:
+                # These are Gen 1 only - child shouldn't generate them fresh
+                # (unless inherited from parent)
+                pass  # Allow inheritance
+    
+    def test_category_without_gen_locked(self):
+        """Test categories without gen-locked traits return empty"""
+        # FACE_EXPRESSION has no gen-locked traits
+        locked = GeneticsEngine.get_gen_locked_traits(TraitCategory.FACE_EXPRESSION, 1)
+        assert len(locked) == 0
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

@@ -16,7 +16,7 @@ from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
 
-from src.genetics import GeneticsEngine, MonkeyDNA
+from src.genetics import GeneticsEngine, MonkeyDNA, TraitCategory
 from src.storage import MonkeyStorage
 from src.visualizer import MonkeyVisualizer
 from src.evolution import EvolutionAgent
@@ -199,6 +199,39 @@ def show():
         console.print("[red]❌ No monkey found! Run 'init' first.[/red]")
         return
     
+    # Get history for age
+    history = storage.get_history()
+    age_days = len(history)
+    rarity = dna.get_rarity_score()
+    
+    # Calculate rarity percentile (simulated based on score distribution)
+    # In reality, this would compare against community data
+    # For now, we estimate based on the score
+    if rarity >= 80:
+        percentile = 99
+    elif rarity >= 60:
+        percentile = 95
+    elif rarity >= 40:
+        percentile = 80
+    elif rarity >= 25:
+        percentile = 50
+    else:
+        percentile = 100 - int(rarity * 2)  # Lower scores = lower percentile
+    
+    # Determine tier
+    if rarity >= 80:
+        tier = "🦄 LEGENDARY"
+        tier_color = "magenta"
+    elif rarity >= 50:
+        tier = "💙 RARE"
+        tier_color = "blue"
+    elif rarity >= 25:
+        tier = "💚 UNCOMMON"
+        tier_color = "green"
+    else:
+        tier = "⚪ COMMON"
+        tier_color = "white"
+    
     # Stats table
     table = Table(title="Monkey Stats")
     table.add_column("Property", style="cyan")
@@ -206,23 +239,79 @@ def show():
     
     table.add_row("DNA Hash", dna.dna_hash)
     table.add_row("Generation", str(dna.generation))
+    table.add_row("Age", f"{age_days} days")
     table.add_row("Parent", dna.parent_id or "None (Genesis)")
     table.add_row("Mutations", str(dna.mutation_count))
-    table.add_row("Rarity Score", f"{dna.get_rarity_score():.1f}/100")
+    table.add_row("Rarity Score", f"{rarity:.1f}/100")
+    table.add_row("Rarity Tier", f"[{tier_color}]{tier}[/{tier_color}]")
+    table.add_row("Percentile", f"Rarer than {percentile}% of monkeys")
+    
+    # Get streak info
+    streak_data = storage.get_streak()
+    current_streak = streak_data.get("current", 0)
+    table.add_row("🔥 Streak", f"{current_streak} days")
     
     console.print(table)
     
-    # Traits table
+    # Traits table with gen-locked indicator
     traits_table = Table(title="Traits")
     traits_table.add_column("Category", style="cyan")
     traits_table.add_column("Value", style="green")
     traits_table.add_column("Rarity", style="yellow")
+    traits_table.add_column("Special", style="magenta")
+    
+    rarity_colors = {
+        'common': 'white',
+        'uncommon': 'green', 
+        'rare': 'blue',
+        'legendary': 'magenta'
+    }
+    
+    # Get gen-locked traits for current generation
+    from src.genetics import GeneticsEngine
     
     for cat, trait in dna.traits.items():
-        traits_table.add_row(cat.value, trait.value, trait.rarity.value)
+        color = rarity_colors.get(trait.rarity.value, 'white')
+        
+        # Check if this is a gen-locked trait
+        gen_locked = GeneticsEngine.get_gen_locked_traits(cat, dna.generation)
+        is_gen_locked = trait.value in gen_locked
+        
+        special = ""
+        if is_gen_locked:
+            # Find which generation it's locked to
+            if cat in GeneticsEngine.GEN_LOCKED_TRAITS:
+                for max_gen, traits in GeneticsEngine.GEN_LOCKED_TRAITS[cat].items():
+                    if trait.value in traits:
+                        special = f"🔒 Gen 1-{max_gen} only!"
+                        break
+        
+        traits_table.add_row(
+            cat.value.replace('_', ' ').title(), 
+            trait.value.replace('_', ' ').title(), 
+            f"[{color}]{trait.rarity.value}[/{color}]",
+            special
+        )
     
     console.print("\n")
     console.print(traits_table)
+    
+    # Check for extinct traits that are now unavailable
+    if dna.generation > 1:
+        extinct_count = 0
+        for cat in TraitCategory:
+            locked = GeneticsEngine.get_gen_locked_traits(cat, dna.generation)
+            all_locked = []
+            if cat in GeneticsEngine.GEN_LOCKED_TRAITS:
+                for max_gen, traits in GeneticsEngine.GEN_LOCKED_TRAITS[cat].items():
+                    if dna.generation > max_gen:
+                        extinct_count += len(traits)
+        
+        if extinct_count > 0:
+            console.print(f"\n[dim]⚠️  {extinct_count} trait(s) are now extinct for your generation. Fork earlier to get them![/dim]")
+    
+    # Show flex message
+    console.print(f"\n[dim]💪 Flex: \"My monkey is rarer than {percentile}% of all ForkMonkeys!\"[/dim]")
 
 
 @cli.command()
@@ -340,16 +429,72 @@ def update_readme():
     # Update stats section
     history = storage.get_history()
     age_days = len(history)
+    rarity = dna.get_rarity_score()
+    
+    # Calculate rarity tier for display
+    if rarity >= 80:
+        tier_emoji = "🦄"
+        tier_name = "LEGENDARY"
+    elif rarity >= 50:
+        tier_emoji = "💙"
+        tier_name = "RARE"
+    elif rarity >= 25:
+        tier_emoji = "💚"
+        tier_name = "UNCOMMON"
+    else:
+        tier_emoji = "⚪"
+        tier_name = "COMMON"
     
     stats_section = f'''<!-- MONKEY_STATS_START -->
-- **Generation**: {dna.generation}
-- **Age**: {age_days} days
-- **Mutations**: {dna.mutation_count}
-- **Rarity Score**: {dna.get_rarity_score():.1f}/100
+| Generation | Age | Mutations | Rarity Score |
+|:----------:|:---:|:---------:|:------------:|
+| {dna.generation} | {age_days} days | {dna.mutation_count} | {rarity:.1f}/100 |
 <!-- MONKEY_STATS_END -->'''
     
     pattern = r'<!-- MONKEY_STATS_START -->.*?<!-- MONKEY_STATS_END -->'
     readme = re.sub(pattern, stats_section, readme, flags=re.DOTALL)
+    
+    # Update lineage stats section
+    # Get notable traits for breeding pitch
+    from src.genetics import Rarity
+    notable_traits = []
+    for cat, trait in dna.traits.items():
+        if trait.rarity in [Rarity.RARE, Rarity.LEGENDARY]:
+            notable_traits.append(f"**{trait.value.replace('_', ' ').title()}** ({trait.rarity.value})")
+    
+    if notable_traits:
+        traits_text = ", ".join(notable_traits[:2])  # Show top 2
+        lineage_section = f'''<!-- LINEAGE_STATS_START -->
+🧬 **Notable Traits:** {traits_text}
+
+🍴 Fork to inherit these rare genetics!
+<!-- LINEAGE_STATS_END -->'''
+    else:
+        lineage_section = '''<!-- LINEAGE_STATS_START -->
+🧬 **Lineage Stats:** This monkey has inspired a growing family tree!
+<!-- LINEAGE_STATS_END -->'''
+    
+    pattern = r'<!-- LINEAGE_STATS_START -->.*?<!-- LINEAGE_STATS_END -->'
+    if re.search(pattern, readme, flags=re.DOTALL):
+        readme = re.sub(pattern, lineage_section, readme, flags=re.DOTALL)
+    
+    # Update breeding boost section with urgency
+    import random
+    boost_messages = [
+        "⚡ **First 5 forks get +15% legendary trait inheritance!**",
+        "🔥 **Breeding boost active!** Fork now for enhanced trait inheritance.",
+        "✨ **Limited time:** Rare trait inheritance rates boosted!",
+        "🎯 **Today only:** Higher chance to inherit legendary traits!"
+    ]
+    boost_msg = random.choice(boost_messages)
+    
+    breeding_section = f'''<!-- BREEDING_BOOST_START -->
+{boost_msg}
+<!-- BREEDING_BOOST_END -->'''
+    
+    pattern = r'<!-- BREEDING_BOOST_START -->.*?<!-- BREEDING_BOOST_END -->'
+    if re.search(pattern, readme, flags=re.DOTALL):
+        readme = re.sub(pattern, breeding_section, readme, flags=re.DOTALL)
     
     # Save
     readme_file.write_text(readme)
@@ -459,6 +604,268 @@ Fork yours free: github.com/{repo}
     
     console.print(f"\n[dim]Or open directly:[/dim]")
     console.print(f"[link={twitter_url}]{twitter_url[:80]}...[/link]")
+
+
+@cli.command()
+@click.option('--copy', '-c', is_flag=True, help='Copy to clipboard')
+def share_card(copy):
+    """Generate a Wordle-style shareable evolution card"""
+    console.print("\n🎨 [bold cyan]Generating Evolution Card...[/bold cyan]\n")
+    
+    storage = MonkeyStorage()
+    dna = storage.load_dna()
+    
+    if not dna:
+        console.print("[red]❌ No monkey found! Run 'init' first.[/red]")
+        return
+    
+    # Get stats
+    history = storage.get_history()
+    age_days = len(history)
+    rarity = dna.get_rarity_score()
+    repo = os.environ.get('GITHUB_REPOSITORY', 'roeiba/forkMonkey')
+    
+    # Calculate rarity change (compare to yesterday if available)
+    rarity_change = ""
+    if len(history) >= 2:
+        yesterday_rarity = history[-2].get('rarity_score', rarity)
+        change = rarity - yesterday_rarity
+        if change > 0:
+            rarity_change = f" (+{change:.1f})"
+        elif change < 0:
+            rarity_change = f" ({change:.1f})"
+    
+    # Rarity emoji mapping
+    def get_rarity_emoji(rarity_level):
+        return {
+            'common': '⬜',
+            'uncommon': '🟩', 
+            'rare': '🟦',
+            'legendary': '🟪'
+        }.get(rarity_level.value if hasattr(rarity_level, 'value') else rarity_level, '⬜')
+    
+    def get_rarity_stars(rarity_level):
+        return {
+            'common': '',
+            'uncommon': '⭐',
+            'rare': '⭐⭐',
+            'legendary': '⭐⭐⭐'
+        }.get(rarity_level.value if hasattr(rarity_level, 'value') else rarity_level, '')
+    
+    # Build the card
+    lines = []
+    lines.append(f"🐵 ForkMonkey Day {age_days}")
+    lines.append("")
+    
+    # Trait lines with visual indicators
+    trait_order = ['body_color', 'face_expression', 'accessory', 'pattern', 'background', 'special']
+    trait_labels = {
+        'body_color': 'Body',
+        'face_expression': 'Face', 
+        'accessory': 'Item',
+        'pattern': 'Pattern',
+        'background': 'Scene',
+        'special': 'Aura'
+    }
+    
+    for trait_key in trait_order:
+        from src.genetics import TraitCategory
+        cat = TraitCategory(trait_key)
+        if cat in dna.traits:
+            trait = dna.traits[cat]
+            emoji = get_rarity_emoji(trait.rarity)
+            stars = get_rarity_stars(trait.rarity)
+            # Create a row of 5 emojis based on rarity
+            emoji_row = emoji * 5
+            display_value = trait.value.replace('_', ' ').title()
+            if stars:
+                lines.append(f"{emoji_row} {trait_labels[trait_key]}: {display_value} {stars}")
+            else:
+                lines.append(f"{emoji_row} {trait_labels[trait_key]}: {display_value}")
+    
+    # Calculate percentile
+    if rarity >= 80:
+        percentile = 99
+    elif rarity >= 60:
+        percentile = 95
+    elif rarity >= 40:
+        percentile = 80
+    elif rarity >= 25:
+        percentile = 50
+    else:
+        percentile = 100 - int(rarity * 2)
+    
+    lines.append("")
+    lines.append(f"📈 Rarity: {rarity:.1f}/100{rarity_change}")
+    lines.append(f"🏆 Rarer than {percentile}% of monkeys!")
+    lines.append(f"🧬 Gen {dna.generation} | 🔄 {dna.mutation_count} mutations")
+    lines.append("")
+    lines.append(f"Fork yours free: github.com/{repo}")
+    lines.append("#ForkMonkey")
+    
+    card_text = "\n".join(lines)
+    
+    # Display the card
+    panel = Panel(
+        card_text,
+        title="📋 Share Your Evolution",
+        border_style="green",
+        padding=(1, 2)
+    )
+    console.print(panel)
+    
+    # Try to copy to clipboard
+    if copy:
+        try:
+            import pyperclip
+            pyperclip.copy(card_text)
+            console.print("\n[green]✅ Copied to clipboard![/green]")
+        except ImportError:
+            console.print("\n[yellow]⚠️  Install pyperclip for clipboard support: pip install pyperclip[/yellow]")
+        except Exception as e:
+            console.print(f"\n[yellow]⚠️  Could not copy: {e}[/yellow]")
+    
+    # Show share links
+    import urllib.parse
+    encoded = urllib.parse.quote(card_text)
+    twitter_url = f"https://twitter.com/intent/tweet?text={encoded}"
+    
+    console.print(f"\n[dim]Share on Twitter:[/dim]")
+    console.print(f"[link={twitter_url}]Click here to tweet[/link]")
+
+
+@cli.command()
+def streak():
+    """Show your evolution streak"""
+    console.print("\n🔥 [bold cyan]Evolution Streak[/bold cyan]\n")
+    
+    storage = MonkeyStorage()
+    streak_data = storage.get_streak()
+    
+    current = streak_data.get("current", 0)
+    best = streak_data.get("best", 0)
+    last_date = streak_data.get("last_date", "Never")
+    
+    # Visual streak display
+    fire_count = min(current, 10)  # Max 10 fires displayed
+    fires = "🔥" * fire_count
+    if current > 10:
+        fires += f" +{current - 10}"
+    
+    console.print(f"  Current Streak: [bold yellow]{fires}[/bold yellow] ({current} days)")
+    console.print(f"  Best Streak: [bold green]⭐ {best} days[/bold green]")
+    console.print(f"  Last Evolution: [dim]{last_date}[/dim]")
+    
+    # Streak rewards info
+    console.print("\n[bold]🎁 Streak Rewards:[/bold]")
+    
+    rewards = [
+        (7, "Week Warrior", "🏅", "week_warrior"),
+        (14, "Fortnight Fighter", "⚔️", "fortnight"),
+        (30, "Diamond Hands", "💎", "diamond_hands"),
+        (100, "Century Legend", "💯", "century"),
+    ]
+    
+    for days, name, icon, _ in rewards:
+        if current >= days:
+            console.print(f"  {icon} [green]{name} ({days}d) ✅[/green]")
+        else:
+            remaining = days - current
+            console.print(f"  {icon} [dim]{name} ({days}d) - {remaining} days left[/dim]")
+    
+    # Motivational message
+    if current == 0:
+        console.print("\n[yellow]💡 Run 'evolve' daily to build your streak![/yellow]")
+    elif current < 7:
+        console.print(f"\n[yellow]💪 Keep going! {7 - current} more days for Week Warrior![/yellow]")
+    elif current < 30:
+        console.print(f"\n[cyan]🚀 Amazing! {30 - current} more days for Diamond Hands![/cyan]")
+    else:
+        console.print(f"\n[green]👑 Legendary! You're a true ForkMonkey master![/green]")
+
+
+@cli.command()
+def achievements():
+    """Show unlocked achievements"""
+    console.print("\n🏆 [bold cyan]Achievements[/bold cyan]\n")
+    
+    storage = MonkeyStorage()
+    dna = storage.load_dna()
+    
+    if not dna:
+        console.print("[red]❌ No monkey found! Run 'init' first.[/red]")
+        return
+    
+    # Get history and stats for achievement checking
+    history = storage.get_history()
+    age_days = len(history)
+    rarity = dna.get_rarity_score()
+    
+    # Build stats dict for achievement checking
+    stats = {
+        "age_days": age_days,
+        "rarity_score": rarity,
+        "generation": dna.generation,
+        "total_mutations": dna.mutation_count,
+        "created_at": history[0].get("timestamp") if history else None,
+        "children_count": 0,  # Would need to scan forks to get this
+    }
+    
+    # Build dna dict for achievement checking
+    dna_dict = {
+        cat.value: trait.value 
+        for cat, trait in dna.traits.items()
+    }
+    # Add rarity info
+    for cat, trait in dna.traits.items():
+        dna_dict[f"{cat.value}_rarity"] = trait.rarity.value
+    
+    # Check achievements
+    from src.achievements import ACHIEVEMENTS, check_achievements, get_achievement_progress
+    
+    progress = get_achievement_progress(stats, dna_dict)
+    
+    # Display header
+    console.print(f"[bold]Progress: {progress['unlocked_count']}/{progress['total_count']} ({progress['percentage']}%)[/bold]\n")
+    
+    # Create progress bar
+    bar_filled = int(progress['percentage'] / 5)
+    bar_empty = 20 - bar_filled
+    progress_bar = f"[green]{'█' * bar_filled}[/green][dim]{'░' * bar_empty}[/dim]"
+    console.print(f"  {progress_bar}\n")
+    
+    # Group by category
+    categories = {}
+    for achievement in progress['unlocked']:
+        cat = achievement['category']
+        if cat not in categories:
+            categories[cat] = []
+        categories[cat].append(achievement)
+    
+    # Display unlocked
+    if progress['unlocked']:
+        console.print("[bold green]✅ Unlocked:[/bold green]")
+        for cat, achievements_list in categories.items():
+            icons = " ".join([a['icon'] for a in achievements_list])
+            console.print(f"  [cyan]{cat.title()}:[/cyan] {icons}")
+        console.print()
+    
+    # Show next achievements to unlock
+    console.print("[bold yellow]🎯 Next to unlock:[/bold yellow]")
+    unlocked_keys = {a['key'] for a in progress['unlocked']}
+    locked = [(k, v) for k, v in ACHIEVEMENTS.items() if k not in unlocked_keys]
+    
+    # Show first 3 locked achievements
+    for key, achievement in locked[:3]:
+        console.print(f"  {achievement['icon']} [dim]{achievement['title']}[/dim] - {achievement['description']}")
+    
+    # Calculate streak
+    console.print(f"\n[bold cyan]🔥 Evolution Streak:[/bold cyan]")
+    console.print(f"  Current: {age_days} days")
+    if age_days >= 7:
+        console.print(f"  [green]✅ Week Warrior unlocked![/green]")
+    elif age_days >= 1:
+        console.print(f"  [yellow]{7 - age_days} more days for Week Warrior[/yellow]")
 
 
 @cli.command()

@@ -897,6 +897,7 @@ const ForkMonkey = {
             // Escape to close modal
             if (e.key === 'Escape') {
                 this.closeModal();
+                this.closeAdoptionWizard();
             }
 
             // R to refresh
@@ -931,6 +932,353 @@ const ForkMonkey = {
         console.log('%c  R   - Refresh data', 'color: #fff;');
         console.log('%c  D   - Download SVG', 'color: #fff;');
         console.log('%c  Esc - Close modal', 'color: #fff;');
+    },
+
+    // ========================================
+    // ADOPTION WIZARD METHODS
+    // ========================================
+
+    /**
+     * Open the adoption wizard modal
+     */
+    openAdoptionWizard() {
+        const modal = document.getElementById('adoption-modal');
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        // Reset wizard state
+        this.resetAdoptionWizard();
+
+        this.showToast('🐵 Choose your adoption method!', 'info');
+    },
+
+    /**
+     * Close the adoption wizard modal
+     */
+    closeAdoptionWizard() {
+        const modal = document.getElementById('adoption-modal');
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    },
+
+    /**
+     * Reset the adoption wizard to initial state
+     */
+    resetAdoptionWizard() {
+        this.adoption = {
+            method: null,
+            step: 1,
+            customization: {}
+        };
+
+        // Reset step indicators
+        this.updateWizardSteps(1);
+
+        // Show step 1, hide all others
+        this.showWizardContent('wizard-step-1');
+
+        // Clear form inputs
+        const inputs = document.querySelectorAll('.customization-form input, .customization-form select');
+        inputs.forEach(input => {
+            if (input.type === 'text') input.value = '';
+            if (input.tagName === 'SELECT') input.selectedIndex = 0;
+        });
+    },
+
+    /**
+     * Update wizard step indicators
+     */
+    updateWizardSteps(currentStep) {
+        const steps = document.querySelectorAll('.wizard-step');
+        steps.forEach(step => {
+            const stepNum = parseInt(step.dataset.step);
+            step.classList.remove('active', 'completed');
+
+            if (stepNum === currentStep) {
+                step.classList.add('active');
+            } else if (stepNum < currentStep) {
+                step.classList.add('completed');
+            }
+        });
+    },
+
+    /**
+     * Show specific wizard content, hide others
+     */
+    showWizardContent(contentId) {
+        const allContents = document.querySelectorAll('.wizard-content');
+        allContents.forEach(content => content.classList.add('hidden'));
+
+        const targetContent = document.getElementById(contentId);
+        if (targetContent) {
+            targetContent.classList.remove('hidden');
+        }
+    },
+
+    /**
+     * Select adoption method
+     */
+    selectAdoptionMethod(method) {
+        this.adoption.method = method;
+
+        if (method === 'manual') {
+            // For manual, skip customization and go straight to GitHub fork
+            this.handleManualAdoption();
+        } else if (method === 'trustless' || method === 'oauth') {
+            // For managed methods, show customization step
+            this.adoption.step = 2;
+            this.updateWizardSteps(2);
+            this.showWizardContent('wizard-step-2');
+        }
+    },
+
+    /**
+     * Handle manual adoption - redirect to GitHub fork
+     */
+    handleManualAdoption() {
+        const forkUrl = `https://github.com/${this.config.repoOwner}/${this.config.repoName}/fork`;
+
+        // Show success-like instructions first
+        const content = document.getElementById('wizard-step-3-content');
+        content.innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+                <div style="font-size: 3rem; margin-bottom: 16px;">🔧</div>
+                <h3 style="color: var(--primary); font-size: 1.5rem; margin-bottom: 16px;">Manual Setup</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 24px;">
+                    You'll be redirected to GitHub to fork the repository. After forking:
+                </p>
+                <ol style="text-align: left; color: var(--text-secondary); margin: 0 auto 24px; max-width: 400px; line-height: 2;">
+                    <li>Go to your fork's <strong>Settings → Pages</strong></li>
+                    <li>Set Source to <strong>GitHub Actions</strong></li>
+                    <li>Go to <strong>Actions</strong> tab and enable workflows</li>
+                    <li>Run the "Initialize New Monkey" workflow manually</li>
+                </ol>
+                <a href="${forkUrl}" target="_blank" class="wizard-btn primary" style="text-decoration: none; display: inline-flex;">
+                    🍴 Fork on GitHub
+                </a>
+                <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 16px;">
+                    Opens in a new tab
+                </p>
+            </div>
+        `;
+
+        this.adoption.step = 3;
+        this.updateWizardSteps(3);
+        this.showWizardContent('wizard-step-3');
+    },
+
+    /**
+     * Navigate to next wizard step
+     */
+    wizardNext() {
+        // Collect customization data
+        this.adoption.customization = this.getCustomizationData();
+
+        if (this.adoption.method === 'trustless') {
+            // Show GitHub username input
+            this.showWizardContent('wizard-trustless-input');
+            this.adoption.step = 3;
+            this.updateWizardSteps(3);
+        } else if (this.adoption.method === 'oauth') {
+            // Start OAuth flow
+            this.initiateOAuthFlow();
+        }
+    },
+
+    /**
+     * Navigate to previous wizard step
+     */
+    wizardBack() {
+        if (this.adoption.step === 2) {
+            this.adoption.step = 1;
+            this.adoption.method = null;
+            this.updateWizardSteps(1);
+            this.showWizardContent('wizard-step-1');
+        } else if (this.adoption.step === 3) {
+            this.adoption.step = 2;
+            this.updateWizardSteps(2);
+            this.showWizardContent('wizard-step-2');
+        }
+    },
+
+    /**
+     * Get customization data from form
+     */
+    getCustomizationData() {
+        return {
+            name: document.getElementById('custom-name')?.value || '',
+            body_color: document.getElementById('custom-body-color')?.value || '',
+            face_expression: document.getElementById('custom-expression')?.value || '',
+            accessory: document.getElementById('custom-accessory')?.value || ''
+        };
+    },
+
+    /**
+     * Submit trustless adoption request
+     */
+    async submitTrustlessAdoption() {
+        const username = document.getElementById('github-username')?.value?.trim();
+
+        if (!username) {
+            this.showToast('Please enter your GitHub username', 'error');
+            return;
+        }
+
+        // Validate username format
+        if (!/^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/.test(username)) {
+            this.showToast('Invalid GitHub username format', 'error');
+            return;
+        }
+
+        // Show loading state
+        this.showWizardContent('wizard-loading');
+        document.getElementById('wizard-loading-text').textContent = 'Creating your monkey...';
+
+        try {
+            const response = await fetch(`${this.config.apiBaseUrl}/adopt/trustless`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    github_username: username,
+                    customization: this.adoption.customization
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                this.showTrustlessSuccess(data);
+            } else {
+                throw new Error(data.error || 'Failed to create monkey');
+            }
+        } catch (error) {
+            console.error('Trustless adoption error:', error);
+            this.showWizardError(error.message || 'Failed to create your monkey. Please try again.');
+        }
+    },
+
+    /**
+     * Show trustless adoption success
+     */
+    showTrustlessSuccess(data) {
+        const content = document.getElementById('wizard-success-content');
+        content.innerHTML = `
+            <p style="color: var(--text-secondary); margin-bottom: 24px;">
+                Your monkey has been created! Check your email for the transfer request.
+            </p>
+            <div style="background: var(--bg-card); padding: 20px; border-radius: 12px; margin-bottom: 24px;">
+                <h4 style="color: var(--primary); margin-bottom: 12px;">📧 Next Steps</h4>
+                <ol style="color: var(--text-secondary); text-align: left; line-height: 2; padding-left: 20px;">
+                    <li>Check your email from GitHub</li>
+                    <li>Accept the repository transfer</li>
+                    <li>Your monkey will be live at:
+                        <code style="color: var(--accent);">https://${data.github_username || 'you'}.github.io/forkMonkey/</code>
+                    </li>
+                </ol>
+            </div>
+            <button class="wizard-btn primary" onclick="ForkMonkey.closeAdoptionWizard()">
+                Got it! 🎉
+            </button>
+        `;
+        this.showWizardContent('wizard-success');
+        this.showToast('🎉 Monkey created! Check your email.', 'success');
+    },
+
+    /**
+     * Show wizard error
+     */
+    showWizardError(message) {
+        document.getElementById('wizard-error-message').textContent = message;
+        this.showWizardContent('wizard-error');
+    },
+
+    /**
+     * Initiate OAuth flow for full-trust adoption
+     */
+    async initiateOAuthFlow() {
+        this.showWizardContent('wizard-loading');
+        document.getElementById('wizard-loading-text').textContent = 'Redirecting to GitHub...';
+
+        try {
+            // Store customization in session storage for after OAuth callback
+            sessionStorage.setItem('forkmonkey_customization', JSON.stringify(this.adoption.customization));
+
+            // Redirect to OAuth authorization
+            const response = await fetch(`${this.config.apiBaseUrl}/adopt/oauth/authorize`);
+            const data = await response.json();
+
+            if (data.auth_url) {
+                window.location.href = data.auth_url;
+            } else {
+                throw new Error('Failed to get authorization URL');
+            }
+        } catch (error) {
+            console.error('OAuth initiation error:', error);
+            this.showWizardError('OAuth flow is not yet configured. Please use Manual or Trustless method.');
+        }
+    },
+
+    /**
+     * Complete OAuth adoption (called after OAuth callback)
+     */
+    async completeOAuthAdoption() {
+        const customization = JSON.parse(sessionStorage.getItem('forkmonkey_customization') || '{}');
+
+        this.openAdoptionWizard();
+        this.showWizardContent('wizard-loading');
+        document.getElementById('wizard-loading-text').textContent = 'Setting up your monkey...';
+
+        try {
+            const response = await fetch(`${this.config.apiBaseUrl}/adopt/oauth/complete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ customization })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                this.showOAuthSuccess(data);
+            } else {
+                throw new Error(data.error || 'Failed to complete setup');
+            }
+        } catch (error) {
+            console.error('OAuth completion error:', error);
+            this.showWizardError(error.message || 'Failed to complete setup. Please try again.');
+        } finally {
+            sessionStorage.removeItem('forkmonkey_customization');
+        }
+    },
+
+    /**
+     * Show OAuth adoption success
+     */
+    showOAuthSuccess(data) {
+        const content = document.getElementById('wizard-success-content');
+        content.innerHTML = `
+            <p style="color: var(--text-secondary); margin-bottom: 24px;">
+                Your monkey is ready! Everything has been set up automatically.
+            </p>
+            <div style="background: var(--bg-card); padding: 20px; border-radius: 12px; margin-bottom: 24px;">
+                <h4 style="color: var(--primary); margin-bottom: 12px;">🐵 Your Monkey</h4>
+                <p style="color: var(--text-secondary); margin-bottom: 12px;">
+                    Repository: <a href="${data.repo_url}" target="_blank" style="color: var(--accent);">${data.repo_url}</a>
+                </p>
+                <p style="color: var(--text-secondary);">
+                    Website: <a href="${data.pages_url}" target="_blank" style="color: var(--accent);">${data.pages_url}</a>
+                </p>
+            </div>
+            <a href="${data.pages_url || data.repo_url}" target="_blank" 
+               class="wizard-btn primary" style="text-decoration: none; display: inline-flex;">
+                🚀 Visit Your Monkey
+            </a>
+        `;
+        this.showWizardContent('wizard-success');
+        this.showToast('🎉 Your monkey is live!', 'success');
     }
 };
 

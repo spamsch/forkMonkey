@@ -811,6 +811,8 @@ body {
 .evolution-card-preview {
     width: 80px;
     height: 80px;
+    min-width: 80px;
+    min-height: 80px;
     flex-shrink: 0;
     background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
     display: flex;
@@ -818,12 +820,14 @@ body {
     justify-content: center;
     border-radius: var(--radius-md);
     overflow: hidden;
+    position: relative;
 }
 
 .evolution-card-preview svg {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+    max-width: 80px;
+    max-height: 80px;
+    width: 80px;
+    height: 80px;
 }
 
 .evolution-card-info {

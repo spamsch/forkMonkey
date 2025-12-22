@@ -188,6 +188,30 @@ class GitHubService:
         except GithubException as e:
             return {'success': False, 'error': str(e)}
     
+    def add_collaborator(self, repo_full_name: str, username: str, permission: str = 'admin') -> Dict[str, Any]:
+        """
+        Add a user as collaborator with specified permission.
+        
+        Args:
+            repo_full_name: Full repository name (owner/repo).
+            username: GitHub username to add as collaborator.
+            permission: Permission level ('pull', 'push', 'admin', 'maintain', 'triage').
+            
+        Returns:
+            Dictionary with operation result.
+        """
+        try:
+            repo = self.github.get_repo(repo_full_name)
+            repo.add_to_collaborators(username, permission=permission)
+            
+            return {
+                'success': True,
+                'message': f'{username} added as {permission} collaborator'
+            }
+            
+        except GithubException as e:
+            return {'success': False, 'error': str(e)}
+    
     def validate_username(self, username: str) -> Dict[str, Any]:
         """
         Validate that a GitHub username exists.
@@ -264,10 +288,10 @@ class GitHubService:
         # Wait for workflow to start
         time.sleep(5)
         
-        # Create transfer request
-        transfer_result = self.create_transfer_request(repo_full_name, target_username)
-        if not transfer_result.get('success'):
-            return {'success': False, 'error': f"Failed to initiate transfer: {transfer_result.get('error')}"}
+        # Add user as admin collaborator (transfer API doesn't work for org->user)
+        collab_result = self.add_collaborator(repo_full_name, target_username, 'admin')
+        if not collab_result.get('success'):
+            return {'success': False, 'error': f"Failed to add collaborator: {collab_result.get('error')}"}
         
         return {
             'success': True,
@@ -275,7 +299,9 @@ class GitHubService:
             'repo_url': fork_result.get('url'),
             'github_username': target_username,
             'pages_url': pages_result.get('pages_url'),
-            'message': f'Repository created and transfer request sent to {target_username}'
+            'message': f'Repository created! {target_username} added as admin collaborator.',
+            'claim_url': f"https://github.com/{repo_full_name}/settings",
+            'ownership': 'collaborator'
         }
     
     def get_installation_client(self, app_id: str, private_key: str, installation_id: int) -> Github:

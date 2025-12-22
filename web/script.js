@@ -1691,26 +1691,30 @@ https://roeiba.github.io/forkMonkey/
      */
     showTrustlessSuccess(data) {
         const content = document.getElementById('wizard-success-content');
+        const claimUrl = data.claim_url || `${data.repo_url}/settings`;
         content.innerHTML = `
             <p style="color: var(--text-secondary); margin-bottom: 24px;">
-                Your monkey has been created! Check your email for the transfer request.
+                Your monkey has been created! You've been added as an admin collaborator.
             </p>
             <div style="background: var(--bg-card); padding: 20px; border-radius: 12px; margin-bottom: 24px;">
-                <h4 style="color: var(--primary); margin-bottom: 12px;">📧 Next Steps</h4>
+                <h4 style="color: var(--primary); margin-bottom: 12px;">✅ Next Steps</h4>
                 <ol style="color: var(--text-secondary); text-align: left; line-height: 2; padding-left: 20px;">
-                    <li>Check your email from GitHub</li>
-                    <li>Accept the repository transfer</li>
-                    <li>Your monkey will be live at:
-                        <code style="color: var(--accent);">https://${data.github_username || 'you'}.github.io/forkMonkey/</code>
+                    <li>Check your email - accept the <strong>collaborator invite</strong></li>
+                    <li>Visit your monkey's home:
+                        <a href="${data.repo_url}" target="_blank" style="color: var(--accent);">${data.repo_name || 'Your Repo'}</a>
                     </li>
+                    <li>(Optional) <a href="${claimUrl}" target="_blank" style="color: var(--primary);">Transfer to your account</a> for full ownership</li>
                 </ol>
             </div>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
+                💡 As an admin collaborator, you have full control. Transfer is optional but gives you true ownership.
+            </p>
             <button class="wizard-btn primary" onclick="ForkMonkey.closeAdoptionWizard()">
                 Got it! 🎉
             </button>
         `;
         this.showWizardContent('wizard-success');
-        this.showToast('🎉 Monkey created! Check your email.', 'success');
+        this.showToast('🎉 Monkey created! Check your email for collaborator invite.', 'success');
     },
 
     /**

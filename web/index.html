@@ -534,21 +534,6 @@
                         <div class="method-badge">DIY</div>
                     </div>
 
-                    <!-- Trustless Method -->
-                    <div class="method-card" onclick="ForkMonkey.selectAdoptionMethod('trustless')">
-                        <div class="method-icon">🔐</div>
-                        <div class="method-info">
-                            <h3>Trustless</h3>
-                            <p>We prepare your monkey, then add you as collaborator</p>
-                            <div class="method-features">
-                                <span class="feature">✓ Pre-configured</span>
-                                <span class="feature">✓ No permissions needed</span>
-                                <span class="feature-warn">⚠ Accept transfer email</span>
-                            </div>
-                        </div>
-                        <div class="method-badge recommended">Recommended</div>
-                    </div>
-
                     <!-- Full Trust Method -->
                     <div class="method-card" onclick="ForkMonkey.selectAdoptionMethod('oauth')">
                         <div class="method-icon">✨</div>
@@ -561,7 +546,22 @@
                                 <span class="feature-warn">⚠ App authorization</span>
                             </div>
                         </div>
-                        <div class="method-badge premium">Premium</div>
+                        <div class="method-badge recommended">Recommended</div>
+                    </div>
+
+                    <!-- Trustless Method -->
+                    <div class="method-card" onclick="ForkMonkey.selectAdoptionMethod('trustless')">
+                        <div class="method-icon">🔐</div>
+                        <div class="method-info">
+                            <h3>Trustless</h3>
+                            <p>We prepare your monkey, then add you as collaborator</p>
+                            <div class="method-features">
+                                <span class="feature">✓ Pre-configured</span>
+                                <span class="feature">✓ No permissions needed</span>
+                                <span class="feature-warn">⚠ Accept invite email</span>
+                            </div>
+                        </div>
+                        <div class="method-badge">Collaborator</div>
                     </div>
                 </div>
             </div>

@@ -1597,6 +1597,23 @@
       },
       "story": "Your monkey evolved! Changes: body_color: beige \u2192 tan, background: blue_sky \u2192 beach",
       "svg_filename": "2026-02-20_02-28_monkey.svg"
+    },
+    {
+      "timestamp": "2026-02-21T02:23:04.147908",
+      "dna_hash": "2b7d3d4db9264954",
+      "generation": 2,
+      "mutation_count": 30,
+      "rarity_score": 13.333333333333334,
+      "traits": {
+        "body_color": "tan",
+        "face_expression": "cool",
+        "accessory": "bandana",
+        "pattern": "solid",
+        "background": "beach",
+        "special": "none"
+      },
+      "story": "Your monkey rested today. No visible changes.",
+      "svg_filename": "2026-02-21_02-23_monkey.svg"
     }
   ]
 }

@@ -2090,6 +2090,23 @@
       },
       "story": "Your monkey evolved! Changes: pattern: solid \u2192 spots",
       "svg_filename": "2026-03-21_02-23_monkey.svg"
+    },
+    {
+      "timestamp": "2026-03-22T02:37:50.950030",
+      "dna_hash": "ac0b382b17c5115c",
+      "generation": 2,
+      "mutation_count": 50,
+      "rarity_score": 11.666666666666666,
+      "traits": {
+        "body_color": "tan",
+        "face_expression": "neutral",
+        "accessory": "none",
+        "pattern": "spots",
+        "background": "city",
+        "special": "none"
+      },
+      "story": "Your monkey evolved! Changes: accessory: bow \u2192 none",
+      "svg_filename": "2026-03-22_02-37_monkey.svg"
     }
   ]
 }

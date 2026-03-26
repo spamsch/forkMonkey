@@ -1,8 +1,8 @@
 {
   "generation": 2,
   "parent_id": "1fc3679bbb7d211c",
-  "dna_hash": "1d20f0958cbdcd15",
-  "mutation_count": 51,
+  "dna_hash": "ac0b382b17c5115c",
+  "mutation_count": 52,
   "birth_timestamp": 493158,
   "traits": {
     "body_color": {
@@ -11,9 +11,9 @@
       "gene_sequence": "11949536"
     },
     "face_expression": {
-      "value": "happy",
+      "value": "neutral",
       "rarity": "common",
-      "gene_sequence": "84ed1537"
+      "gene_sequence": "374db983"
     },
     "accessory": {
       "value": "none",

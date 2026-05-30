@@ -3263,6 +3263,23 @@
       },
       "story": "Your monkey evolved! Changes: pattern: diamonds \u2192 flames",
       "svg_filename": "2026-05-29_03-59_monkey.svg"
+    },
+    {
+      "timestamp": "2026-05-30T03:45:52.232931",
+      "dna_hash": "d10fa39e58771191",
+      "generation": 2,
+      "mutation_count": 97,
+      "rarity_score": 20.0,
+      "traits": {
+        "body_color": "tan",
+        "face_expression": "curious",
+        "accessory": "crown",
+        "pattern": "flames",
+        "background": "blue_sky",
+        "special": "glow"
+      },
+      "story": "Your monkey evolved! Changes: accessory: monocle \u2192 crown",
+      "svg_filename": "2026-05-30_03-45_monkey.svg"
     }
   ]
 }

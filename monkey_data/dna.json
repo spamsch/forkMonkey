@@ -1,8 +1,8 @@
 {
   "generation": 2,
   "parent_id": "1fc3679bbb7d211c",
-  "dna_hash": "14393751ec6d8196",
-  "mutation_count": 96,
+  "dna_hash": "d10fa39e58771191",
+  "mutation_count": 97,
   "birth_timestamp": 493158,
   "traits": {
     "body_color": {
@@ -16,9 +16,9 @@
       "gene_sequence": "7d0bf056"
     },
     "accessory": {
-      "value": "monocle",
+      "value": "crown",
       "rarity": "uncommon",
-      "gene_sequence": "4b7e2599"
+      "gene_sequence": "fa89ebac"
     },
     "pattern": {
       "value": "flames",

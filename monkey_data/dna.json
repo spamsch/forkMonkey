@@ -1,8 +1,8 @@
 {
   "generation": 2,
   "parent_id": "1fc3679bbb7d211c",
-  "dna_hash": "ba6cc9be4bb1a74d",
-  "mutation_count": 106,
+  "dna_hash": "0e55d22d066ef1eb",
+  "mutation_count": 108,
   "birth_timestamp": 493158,
   "traits": {
     "body_color": {
@@ -26,15 +26,15 @@
       "gene_sequence": "5aa6e7de"
     },
     "background": {
-      "value": "blue_sky",
-      "rarity": "common",
-      "gene_sequence": "1893587b"
+      "value": "mountains",
+      "rarity": "uncommon",
+      "gene_sequence": "ec41435d"
     },
     "special": {
-      "value": "glow",
+      "value": "shadow",
       "rarity": "uncommon",
-      "gene_sequence": "0903c0f5"
+      "gene_sequence": "db06738c"
     }
   },
-  "rarity_score": 25.0
+  "rarity_score": 26.666666666666668
 }

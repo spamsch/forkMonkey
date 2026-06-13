@@ -1,8 +1,8 @@
 {
   "generation": 2,
   "parent_id": "1fc3679bbb7d211c",
-  "dna_hash": "6f06ef940dd62bed",
-  "mutation_count": 114,
+  "dna_hash": "fb2ea9c628e62bd3",
+  "mutation_count": 115,
   "birth_timestamp": 493158,
   "traits": {
     "body_color": {
@@ -16,9 +16,9 @@
       "gene_sequence": "399185f3"
     },
     "accessory": {
-      "value": "wings",
+      "value": "jetpack",
       "rarity": "legendary",
-      "gene_sequence": "b6b9711d"
+      "gene_sequence": "ec211553"
     },
     "pattern": {
       "value": "hearts",

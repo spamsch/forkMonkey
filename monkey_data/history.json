@@ -3518,6 +3518,23 @@
       },
       "story": "Your monkey evolved! Changes: accessory: wings \u2192 jetpack",
       "svg_filename": "2026-06-13_04-08_monkey.svg"
+    },
+    {
+      "timestamp": "2026-06-14T04:25:08.180331",
+      "dna_hash": "01133761437548a4",
+      "generation": 2,
+      "mutation_count": 116,
+      "rarity_score": 30.0,
+      "traits": {
+        "body_color": "tan",
+        "face_expression": "sleepy",
+        "accessory": "jetpack",
+        "pattern": "hearts",
+        "background": "mountains",
+        "special": "glow"
+      },
+      "story": "Your monkey evolved! Changes: body_color: brown \u2192 tan",
+      "svg_filename": "2026-06-14_04-25_monkey.svg"
     }
   ]
 }

@@ -3654,6 +3654,23 @@
       },
       "story": "Your monkey rested today. No visible changes.",
       "svg_filename": "2026-06-21_04-43_monkey.svg"
+    },
+    {
+      "timestamp": "2026-06-22T04:48:53.485243",
+      "dna_hash": "2c293ee6c0651e82",
+      "generation": 2,
+      "mutation_count": 122,
+      "rarity_score": 33.33333333333333,
+      "traits": {
+        "body_color": "bronze",
+        "face_expression": "excited",
+        "accessory": "jetpack",
+        "pattern": "diamonds",
+        "background": "city",
+        "special": "sparkles"
+      },
+      "story": "Your monkey evolved! Changes: special: glow \u2192 sparkles",
+      "svg_filename": "2026-06-22_04-48_monkey.svg"
     }
   ]
 }

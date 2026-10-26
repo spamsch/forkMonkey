@@ -51,15 +51,15 @@
 </defs>
 <rect width="400" height="400" fill="url(#multiverse-gradient)"/>
 
-<ellipse cx="115" cy="140" rx="45" ry="50" fill="#C0C0C0" filter="url(#shadow)"/>
+<ellipse cx="115" cy="140" rx="45" ry="50" fill="#B87333" filter="url(#shadow)"/>
 <ellipse cx="115" cy="140" rx="30" ry="35" fill="#FFB6C1"/>
 <ellipse cx="115" cy="145" rx="18" ry="22" fill="#FF9999"/>
-<ellipse cx="285" cy="140" rx="45" ry="50" fill="#C0C0C0" filter="url(#shadow)"/>
+<ellipse cx="285" cy="140" rx="45" ry="50" fill="#B87333" filter="url(#shadow)"/>
 <ellipse cx="285" cy="140" rx="30" ry="35" fill="#FFB6C1"/>
 <ellipse cx="285" cy="145" rx="18" ry="22" fill="#FF9999"/>
-<ellipse cx="200" cy="200" rx="110" ry="115" fill="#C0C0C0" filter="url(#shadow)"/>
-<ellipse cx="180" cy="140" rx="50" ry="30" fill="#E8E8E8" opacity="0.3"/>
-<g clip-path="url(#head-clip)"><text x="120" y="120" font-size="18" fill="#FFD700" opacity="0.5">★</text><text x="200" y="200" font-size="18" fill="#FFD700" opacity="0.5">★</text><text x="120" y="120" font-size="18" fill="#FFD700" opacity="0.5">★</text><text x="200" y="200" font-size="18" fill="#FFD700" opacity="0.5">★</text><text x="120" y="120" font-size="18" fill="#FFD700" opacity="0.5">★</text><text x="200" y="200" font-size="18" fill="#FFD700" opacity="0.5">★</text><text x="120" y="120" font-size="18" fill="#FFD700" opacity="0.5">★</text><text x="200" y="200" font-size="18" fill="#FFD700" opacity="0.5">★</text></g>
+<ellipse cx="200" cy="200" rx="110" ry="115" fill="#B87333" filter="url(#shadow)"/>
+<ellipse cx="180" cy="140" rx="50" ry="30" fill="#D4A574" opacity="0.3"/>
+<g clip-path="url(#head-clip)"><text x="120" y="120" font-size="18" fill="#FFD700" opacity="0.5">★</text><text x="236" y="124" font-size="18" fill="#FFD700" opacity="0.5">★</text><text x="192" y="128" font-size="18" fill="#FFD700" opacity="0.5">★</text><text x="148" y="132" font-size="18" fill="#FFD700" opacity="0.5">★</text><text x="264" y="136" font-size="18" fill="#FFD700" opacity="0.5">★</text><text x="220" y="140" font-size="18" fill="#FFD700" opacity="0.5">★</text><text x="176" y="144" font-size="18" fill="#FFD700" opacity="0.5">★</text><text x="132" y="148" font-size="18" fill="#FFD700" opacity="0.5">★</text></g>
 <ellipse cx="200" cy="235" rx="70" ry="60" fill="#FFDAB9"/>
 <ellipse cx="200" cy="250" rx="55" ry="40" fill="#DEB887" opacity="0.3"/>
 <ellipse cx="162" cy="185" rx="22" ry="24" fill="#000" opacity="0.08"/>

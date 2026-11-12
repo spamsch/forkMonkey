@@ -51,14 +51,14 @@
 </defs>
 <rect width="400" height="400" fill="url(#heaven-gradient)"/>
 
-<ellipse cx="115" cy="140" rx="45" ry="50" fill="#C0C0C0" filter="url(#shadow)"/>
+<ellipse cx="115" cy="140" rx="45" ry="50" fill="#FFD700" filter="url(#shadow)"/>
 <ellipse cx="115" cy="140" rx="30" ry="35" fill="#FFB6C1"/>
 <ellipse cx="115" cy="145" rx="18" ry="22" fill="#FF9999"/>
-<ellipse cx="285" cy="140" rx="45" ry="50" fill="#C0C0C0" filter="url(#shadow)"/>
+<ellipse cx="285" cy="140" rx="45" ry="50" fill="#FFD700" filter="url(#shadow)"/>
 <ellipse cx="285" cy="140" rx="30" ry="35" fill="#FFB6C1"/>
 <ellipse cx="285" cy="145" rx="18" ry="22" fill="#FF9999"/>
-<ellipse cx="200" cy="200" rx="110" ry="115" fill="#C0C0C0" filter="url(#shadow)"/>
-<ellipse cx="180" cy="140" rx="50" ry="30" fill="#E8E8E8" opacity="0.3"/>
+<ellipse cx="200" cy="200" rx="110" ry="115" fill="#FFD700" filter="url(#shadow)"/>
+<ellipse cx="180" cy="140" rx="50" ry="30" fill="#FFEC8B" opacity="0.3"/>
 <g clip-path="url(#head-clip)"><path d="M185 130 L215 190 L200 190 L230 250" stroke="#FFD700" stroke-width="3" fill="none" opacity="0.5"/></g>
 <ellipse cx="200" cy="235" rx="70" ry="60" fill="#FFDAB9"/>
 <ellipse cx="200" cy="250" rx="55" ry="40" fill="#DEB887" opacity="0.3"/>

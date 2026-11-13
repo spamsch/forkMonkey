@@ -68,18 +68,14 @@
 <circle cx="162" cy="185" r="12" fill="#3D2314"/>
 <circle cx="162" cy="185" r="6" fill="#000"/>
 <circle cx="166" cy="181" r="4" fill="white"/>
-<ellipse cx="238" cy="185" rx="18" ry="20" fill="white"/>
-<circle cx="238" cy="185" r="12" fill="#3D2314"/>
-<circle cx="238" cy="185" r="6" fill="#000"/>
-<circle cx="242" cy="181" r="4" fill="white"/>
+<path d="M223 185 Q238 193 253 185" stroke="#3D2314" stroke-width="3" fill="none"/>
 <g>
             <ellipse cx="200" cy="230" rx="25" ry="18" fill="#8B4513"/>
             <ellipse cx="200" cy="230" rx="22" ry="15" fill="#A0522D"/>
             <ellipse cx="192" cy="230" rx="5" ry="7" fill="#5D2E0C"/>
             <ellipse cx="208" cy="230" rx="5" ry="7" fill="#5D2E0C"/>
         </g>
-<ellipse cx="200" cy="265" rx="28" ry="18" fill="#8B0000"/>
-<ellipse cx="200" cy="272" rx="18" ry="7" fill="#FF6B6B"/>
+<line x1="182" y1="260" x2="218" y2="260" stroke="#5D2E0C" stroke-width="2"/>
 <path d="M125 170 Q125 100 200 90 Q275 100 275 170" stroke="#333" stroke-width="8" fill="none"/><rect x="115" y="155" width="25" height="40" rx="5" fill="#333"/><rect x="260" y="155" width="25" height="40" rx="5" fill="#333"/>
 <text x="110" y="110" font-size="24" fill="#FFD700">✦</text><text x="290" y="110" font-size="24" fill="#FFD700">✦</text><text x="110" y="290" font-size="24" fill="#FFD700">✦</text><text x="290" y="290" font-size="24" fill="#FFD700">✦</text><text x="200" y="70" font-size="24" fill="#FFD700">✦</text>
 <g transform="translate(325, 15)">
